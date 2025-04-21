@@ -1,0 +1,15 @@
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker build -t devops-frontend ./frontend
+    - docker build -t devops-backend ./backend
+
+update-questions:
+  stage: deploy
+  script:
+    - git pull origin main
+    - docker-compose restart backend

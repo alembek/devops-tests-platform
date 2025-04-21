@@ -1,0 +1,30 @@
+import { useState } from 'react';
+import { login, getMe } from '../api';
+
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [msg, setMsg] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await login(email, password);
+    if (res.token) {
+      localStorage.setItem('token', res.token);
+      const user = await getMe(res.token);
+      setMsg(`Hello, ${user.email}`);
+    } else {
+      setMsg(res.detail);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Login</h2>
+      <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} /><br />
+      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /><br />
+      <button type="submit">Login</button>
+      <p>{msg}</p>
+    </form>
+  );
+}
