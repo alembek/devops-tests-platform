@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Request
 
 from pydantic import BaseModel, EmailStr
 
@@ -16,15 +16,16 @@ ALGORITHM = "HS256"
 USERS_FILE = "users.json"
 
 
-GMAIL_USER = "alem.asaubaev@gmail.com"
-GMAIL_PASSWORD = "uphp lowf mdix jjvp"
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
+# Получаем переменные из .env
 
 smtp_host = os.getenv("SMTP_HOST")
-smtp_port = int(os.getenv("SMTP_PORT"))
+
+smtp_port = int(os.getenv("SMTP_PORT", 587))  # по умолчанию 587
+
 smtp_user = os.getenv("SMTP_USER")
+
 smtp_password = os.getenv("SMTP_PASSWORD")
+
 
 auth_router = APIRouter()
 
@@ -92,24 +93,23 @@ def send_registration_email(to_email):
 
     body = "Поздравляем! Вы успешно зарегистрировались на платформе DevOps-тестов."
 
-    
 
     msg = MIMEText(body)
 
     msg["Subject"] = subject
 
-    msg["From"] = "noreply@yourdomain.com"
+    msg["From"] = smtp_user
 
     msg["To"] = to_email
 
 
     try:
 
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
 
             server.starttls()
 
-            server.login("your_username", "your_password")
+            server.login(smtp_user, smtp_password)
 
             server.send_message(msg)
 
@@ -156,12 +156,7 @@ def register(data: RegisterRequest):
 
     save_user(user)
 
-    
-
-    # Отправка письма
-
     send_registration_email(data.email)
-
 
     return {"message": "Registered successfully"}
 
