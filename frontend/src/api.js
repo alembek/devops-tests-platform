@@ -1,4 +1,4 @@
-const API_URL = 'http://backend:8000';
+const API_URL = 'http://185.182.219.45:8000';
 
 export const register = async (email, password) => {
   const res = await fetch(`${API_URL}/register`, {
